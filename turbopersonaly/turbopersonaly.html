@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>turbo-personaly</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.12/clipboard.min.js"></script>
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <nav class="navbar navbar-default">
+        <div class="container">
+
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#collapse-navbar" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" target="_blank" href="https://github.com/olueiro/turbo-personaly">turbo-personaly</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="collapse-navbar">
+                {{#user_not_logged}}
+                <form class="navbar-form navbar-right" action="{{&baseurl}}login" method="post">
+                    <div class="form-group">
+                        <input type="password" name="password" class="form-control" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-default">Log In</button>
+                </form>
+                {{/user_not_logged}}
+                {{#user_logged}}
+                <div class="nav navbar-nav navbar-right">
+                    <p class="navbar-text"><strong>{{user_name}}</strong>
+                    </p><a href="{{&baseurl}}logout" class="btn btn-default navbar-btn">Log Out</a>
+                </div>
+                {{/user_logged}}
+
+            </div>
+
+        </div>
+    </nav>
+
+
+    <div class="container">
+
+        {{#user_logged}}
+        {{#campaigns}}
+        {{^enabled}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <a name="campaign-{{id}}"></a><h1>{{campaign_name}} <small>{{id}}</small><button type="button" for="#campaign-{{id}}" class="btn btn-default btn-sm" style="float:right;">Show</button></h1>
+                </div>
+            </div>
+            <div class="col-md-offset-4 col-md-4" id="campaign-{{id}}" style="display:none;">
+                <div>
+                    <a href="{{&baseurl}}activate?id={{id}}" class="btn btn-primary btn-lg btn-block" onclick="$(this).text('Wait...').attr('disabled', true);$('body').append('<div id=\'over\' style=\'position: absolute;top:0;left:0;width: 100%;height:100%;z-index:2;opacity:0.4;filter: alpha(opacity = 50)\'></div>');">Activate Campaign</a>
+                </div>
+            </div>
+        </div>
+        {{/enabled}}
+        {{#enabled}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <a name="campaign-{{id}}"></a><h1>{{campaign_name}} <small>{{id}}</small><button type="button" for="#campaign-{{id}}" class="btn btn-default btn-sm" style="float:right;">Show</button></h1>
+                </div>
+
+            </div>
+            <div id="campaign-{{id}}" style="display:none;">
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Info</div>
+                        <div class="panel-body">
+                            <p><strong title="id"></strong> {{id}}</p>
+                            <p><strong title="campaign_name"></strong> {{campaign_name}}</p>
+                            <p><strong title="categories">:</strong> {{categories}}</p>
+                            {{#conversion_mode}}<p><strong title="conversion_mode"></strong> {{conversion_mode}}</p>{{/conversion_mode}}
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Volume</div>
+                        <div class="panel-body">
+                            {{#is_cap_defined}}<p><strong title="is_cap_defined"></strong> {{is_cap_defined}}</p>{{/is_cap_defined}}
+                            {{#daily_cap_limit}}<p><strong title="daily_cap_limit"></strong> {{daily_cap_limit}}</p>{{/daily_cap_limit}}
+                            {{#total_cap_limit}}<p><strong title="total_cap_limit"></strong> {{total_cap_limit}}</p>{{/total_cap_limit}}
+                            {{#daily_caps_left}}<p><strong title="daily_caps_left"></strong> {{daily_caps_left}}</p>{{/daily_caps_left}}
+                            {{#total_caps_left}}<p><strong title="total_caps_left"></strong> {{total_caps_left}}</p>{{/total_caps_left}}
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Device</div>
+                        <div class="panel-body">
+                            {{#android_package_id}}<p><strong title="android_package_id"></strong> {{android_package_id}}</p>{{/android_package_id}}
+                            {{#store_app_id}}<p><strong title="store_app_id"></strong> {{store_app_id}}</p>{{/store_app_id}}
+                            {{#restrict_ipod_allow}}<p><strong title="restrict_ipod_allow"></strong> {{restrict_ipod_allow}}</p>{{/restrict_ipod_allow}}
+                            {{#restrict_idfa}}<p><strong title="restrict_idfa"></strong> {{restrict_idfa}}</p>{{/restrict_idfa}}
+                            {{#restrict_gaid}}<p><strong title="restrict_gaid"></strong> {{restrict_gaid}}</p>{{/restrict_gaid}}
+                            {{#ios_min_version}}<p><strong title="ios_min_version"></strong> {{ios_min_version}}</p>{{/ios_min_version}}
+                            {{#ios_max_version}}<p><strong title="ios_max_version"></strong> {{ios_max_version}}</p>{{/ios_max_version}}
+                            {{#android_min_version}}<p><strong title="android_min_version"></strong> {{android_min_version}}</p>{{/android_min_version}}
+                            {{#android_max_version}}<p><strong title="android_max_version"></strong> {{android_max_version}}</p>{{/android_max_version}}
+                            {{#windows_phone_min_version}}<p><strong title="windows_phone_min_version"></strong> {{windows_phone_min_version}}</p>{{/windows_phone_min_version}}
+                            {{#windows_phone_max_version}}<p><strong title="windows_phone_max_version"></strong> {{windows_phone_max_version}}</p>{{/windows_phone_max_version}}
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Restrictions</div>
+                        <div class="panel-body">
+
+                            {{#traffic_adult}}<p><strong title="traffic_adult"></strong> {{traffic_adult}}</p>{{/traffic_adult}}
+                            {{#traffic_incentivized}}<p><strong title="traffic_incentivized"></strong> {{traffic_incentivized}}</p>{{/traffic_incentivized}}
+                            {{#traffic_mediabuyer}}<p><strong title="traffic_mediabuyer"></strong> {{traffic_mediabuyer}}</p>{{/traffic_mediabuyer}}
+                            {{#traffic_search}}<p><strong title="traffic_search"></strong> {{traffic_search}}</p>{{/traffic_search}}
+                            {{#traffic_ads_icon}}<p><strong title="traffic_ads_icon"></strong> {{traffic_ads_icon}}</p>{{/traffic_ads_icon}}
+                            {{#traffic_discovery_app}}<p><strong title="traffic_discovery_app"></strong> {{traffic_discovery_app}}</p>{{/traffic_discovery_app}}
+                            {{#traffic_emailing}}<p><strong title="traffic_emailing"></strong> {{traffic_emailing}}</p>{{/traffic_emailing}}
+                            {{#traffic_sms}}<p><strong title="traffic_sms"></strong> {{traffic_sms}}</p>{{/traffic_sms}}
+                            {{#traffic_mobile_web}}<p><strong title="traffic_mobile_web"></strong> {{traffic_mobile_web}}</p>{{/traffic_mobile_web}}
+                            {{#traffic_desktop_web}}<p><strong title="traffic_desktop_web"></strong> {{traffic_desktop_web}}</p>{{/traffic_desktop_web}}
+                            {{#traffic_social_media}}<p><strong title="traffic_social_media"></strong> {{traffic_social_media}}</p>{{/traffic_social_media}}
+                            {{#traffic_network}}<p><strong title="traffic_network"></strong> {{traffic_network}}</p>{{/traffic_network}}
+                            {{#custom_creatives}}<p><strong title="custom_creatives"></strong> {{custom_creatives}}</p>{{/custom_creatives}}
+                            {{#only_wifi}}<p><strong title="only_wifi"></strong> {{only_wifi}}</p>{{/only_wifi}}
+                            {{#only_3g}}<p><strong title="only_3g"></strong> {{only_3g}}</p>{{/only_3g}}
+                            {{#min_age}}<p><strong title="min_age"></strong> {{min_age}}</p>{{/min_age}}
+
+                        </div>
+                    </div>
+
+{{#show_black_list}}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Blacklist</div>
+                        <div class="panel-body">
+                            {{#subid1}}<p><strong title="subid1"></strong> {{subid1}}</p>{{/subid1}}
+                            {{#subid2}}<p><strong title="subid2"></strong> {{subid2}}</p>{{/subid2}}
+                            {{#subid3}}<p><strong title="subid3"></strong> {{subid3}}</p>{{/subid3}}
+                            {{#subid4}}<p><strong title="subid4"></strong> {{subid4}}</p>{{/subid4}}
+                            {{#subid5}}<p><strong title="subid5"></strong> {{subid5}}</p>{{/subid5}}
+
+                        </div>
+                    </div>
+{{/show_black_list}}
+                </div>
+
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Links</div>
+                        <div class="panel-body">
+                            {{#campaign_icon_url}}<p><strong title="campaign_icon_url"></strong> {{campaign_icon_url}}&nbsp;<button type="button" data-clipboard-text="{{&campaign_icon_url}}" class="btn btn-default btn-xs">Copy</button>&nbsp;<a target="_blank" href="{{&campaign_icon_url}}" class="btn btn-primary btn-xs">View</a></p>{{/campaign_icon_url}}
+                            <p><strong title="tracking_url"></strong> {{tracking_url}}&nbsp;<button type="button" data-clipboard-text="{{&tracking_url}}" class="btn btn-default btn-xs">Copy</button></p>
+                            <p><strong title="creatives_pack_url"></strong> {{creatives_pack_url}}</p>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Creatives</div>
+                        <div style="overflow:scroll;height:525px;">
+                            <table class="table table-striped" style="font-size:14px;">
+                                {{#creatives}}
+                                <tr>
+                                    <td>
+                                        <p style="color:green;font-weight:bold;" id="tags-{{&creative_id}}"></p><button class="btn btn-primary btn-xs" onclick="var tag = prompt('Please enter tag name:');
+if (tag != null) {
+    $.get('{{&baseurl}}addtag', {
+        id: '{{&creative_id}}',
+        tag: tag
+    }).done(function(){
+        $.get('{{&baseurl}}gettags?id={{&creative_id}}', function(result){
+            $('#tags-{{&creative_id}}').html(result);
+        });
+    });
+}">Add Tag</button> <button onclick="var ok = confirm('Are you sure?');
+if(ok == true){
+    $.get('{{&baseurl}}cleartags', {
+        id: '{{&creative_id}}',
+    }).done(function(){
+        $.get('{{&baseurl}}gettags?id={{&creative_id}}', function(result){
+            $('#tags-{{&creative_id}}').html(result);
+        });
+    });
+}" class="btn btn-default btn-xs">Clear All Tags</button></p>
+                                        <script>
+$(function(){
+    $.get("{{&baseurl}}gettags?id={{&creative_id}}", function(result){
+        $("#tags-{{&creative_id}}").html(result);
+    })
+});
+                                        </script>
+                                        {{#creative_url}}<p><strong title="creative_url"></strong> {{creative_url}}&nbsp;<button type="button" data-clipboard-text="{{&creative_url}}" class="btn btn-default btn-xs">Copy</button>&nbsp;<a href="{{&creative_url}}" target="_blank" class="btn btn-primary btn-xs">View</a></p>{{/creative_url}}
+                                        {{#creative_dimensions_width}}<p><strong title="width"></strong> {{creative_dimensions_width}}{{/creative_dimensions_width}}&nbsp;{{#creative_dimensions_height}}<strong title="height"></strong> {{creative_dimensions_height}}</p>{{/creative_dimensions_height}}
+                                        {{#creative_type}}<p><strong title="creative_type"></strong> {{creative_type}}</p>{{/creative_type}}
+                                        {{#file_type}}<p><strong title="file_type"></strong> {{file_type}}</p>{{/file_type}}
+                                    </td>
+                                </tr>
+                                {{/creatives}}
+                                {{^creatives}}
+                                <tr>
+                                    <td>
+                                        <p style="text-align:center;">No creatives found</p>
+                                    </td>
+                                </tr>
+                                {{/creatives}}
+                            </table>
+
+                        </div>
+                    </div>
+
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Payouts</div>
+                        <div style="overflow:scroll;height:525px;">
+                            <table class="table table-striped" style="font-size:14px;">
+                                {{#payouts}}
+                                <tr>
+                                    <td>
+                                        {{#countries}}<p><strong title="countries"></strong> {{countries}}</p>{{/countries}}
+                                        {{#cities}}<p><strong title="cities"></strong> {{cities}}</p>{{/cities}}
+                                        {{#platform}}<p><strong title="platform"></strong> {{platform}}</p>{{/platform}}
+                                        {{#usd_payout}}<p><strong title="usd_payout"></strong> {{usd_payout}}</p>{{/usd_payout}}
+                                    </td>
+                                </tr>
+                                {{/payouts}}
+                                {{^payouts}}
+                                <tr>
+                                    <td>
+                                        <p style="text-align:center;">No payouts found</p>                                    </td>
+                                </tr>
+                                {{/payouts}}
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-offset-9 col-md-3">
+                    <div>
+                        <a href="{{&baseurl}}deactivate?id={{id}}" onclick="return confirm('Are you sure?');" class="btn btn-danger btn-sm btn-block" onclick="$(this).text('Wait...').prop('disabled', true);$('body').append('<div id=\'over\' style=\'position: absolute;top:0;left:0;width: 100%;height:100%;z-index:2;opacity:0.4;filter: alpha(opacity = 50)\'></div>');">Deactivate Campaign</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {{/enabled}}
+        {{/campaigns}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <h1>Tracking<button type="button" class="btn btn-default btn-sm" style="float:right;" for="#tracking">Show</button></h1>
+                </div>
+
+            </div>
+            <div id="tracking" style="display:none;">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Callbacks</div>
+                        <div style="overflow:scroll;height:525px;">
+                            <table class="table table-striped" style="font-size:14px;">
+                                {{#tracking}}
+                                <tr>
+                                    <td>
+                                        {{#id}}<p><strong title="id"></strong> {{id}}</p>{{/id}}
+                                        {{#campaign_name}}<p><strong title="campaign_name"></strong> {{campaign_name}}</p>{{/campaign_name}}
+                                        {{#payout}}<p><strong title="payout"></strong> {{payout}}</p>{{/payout}}
+                                        <p><button type="button" onclick="alert('Clickid = {{clickid}}\nSubid1 = {{subid1}}\nSubid2 = {{subid2}}\nSubid3 = {{subid3}}\nSubid4 = {{subid4}}\nSubid5 = {{subid5}}\nCampaign Id = {{campaign_id}}\nIdfa = {{idfa}}\nGaid = {{gaid}}\nIp = {{ip}}\nPayout = {{payout}}\nDevice Model = {{device_model}}\nDevice Brand = {{device_brand}}\nOs = {{os}}\nOs Version = {{os_version}}\nUser Agent = {{user_agent}}\nOperator = {{operator}}\nDate = {{time}}');" class="btn btn-default btn-xs">Details</button></p>
+                                    </td>
+                                </tr>
+                                {{/tracking}}
+                                {{^tracking}}
+                                <tr>
+                                    <td>
+                                        <p>No callbacks found</p>
+                                    </td>
+                                </tr>
+                                {{/tracking}}
+                            </table>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">URL</div>
+                        <div class="panel-body">
+                            <p>Fill <strong>Global Callback URL</strong> in your Persona.ly profile with URL below to start tracking campaigns.
+                            </p>
+                            <p>{{user_callback}}&nbsp;<button type="button" data-clipboard-text="{{&user_callback}}" class="btn btn-default btn-xs">Copy</button>
+                            </p>
+                        </div>
+                    </div>
+               </div>
+            </div>
+
+        </div>
+        {{/user_logged}}
+
+        <div class="row">
+            <div class="col-md-12"><hr/></div>
+            <div class="col-md-9" style="text-align:left;">
+                <!-- Do not change or remove -->Donation Bitcoin Address: <strong>17iwqdqBnLX97LTCR6WHXpRWMXeQY4oxwF</strong>
+            </div>
+            <div class="col-md-3" style="text-align:right;">
+                <a target="_blank" href="https://opensource.org/licenses/MIT">MIT licensed</a>&nbsp;&nbsp;&nbsp;<a target="_blank" href="https://github.com/olueiro/turbo-personaly">Github Project</a>
+            </div>
+         </div>
+
+    </div>
+
+    <script>
+        function snakeToRegular(s){
+						s = s.toLowerCase();
+            s = s.replace(/^[a-zA-Z0-9]/g, function(m){
+                return m[0].toUpperCase();
+            });
+            s = s.replace(/_[a-zA-Z0-9]/g, function(m){
+                return " " + m[1].toUpperCase();
+            });
+            return s;
+        }
+
+        new Clipboard(document.querySelectorAll('button'));
+        $(function(){
+            $("*[title]").each(function(){
+                $(this).html(snakeToRegular($(this).attr('title')) + ": ");
+            });
+            $("*[for]").each(function(){
+                $(this).click(function(){
+                    var t = $($(this).attr("for"));
+                    if(t.is(":visible")) {
+                        $(this).text("Show");
+                        t.slideUp();
+                    } else {
+                        $(this).text("Hide");
+                        t.slideDown();
+                    }
+                });
+            });
+            var hash = location.hash;
+            if(hash != null && hash != '') {
+                $("*[for='" + hash + "']").trigger("click");
+            }
+        });
+
+    </script>
+</body>
+
+</html>
